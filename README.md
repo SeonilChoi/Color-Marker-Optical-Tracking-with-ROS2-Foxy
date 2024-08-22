@@ -5,3 +5,9 @@ In this work, we present a method for estimating the position and orientation of
 <p align = "left">
   <img src = "" width = 750 />
 </p>
+
+## Description
+
+### camera_pkg
+
+The "camera_pkg" publish image to the topic "namespace/image/data_raw". The geometry of camera is showcased using the "static_camera_tf2_broadcaster".
