@@ -2,7 +2,7 @@
 
 In this work, we present a method for estimating the position and orientation of an object using an optical tracking technique with color marker spheres, implemented in ROS2 Foxy. We employ a stereo-vision system to perform triangulation.
 
-## Description
+## Packages
 
 ### camera_pkg
 
