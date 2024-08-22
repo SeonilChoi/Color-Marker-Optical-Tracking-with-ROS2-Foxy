@@ -26,7 +26,21 @@ The **marker_detector** detects the markers in the image based on a color. The k
 
 ### optical_tracking_msgs
 
+#### KeyPoint
 
+- Compact Message Definition
+```
+geometry_msgs/Point point
+float32[] descriptor
+```
+
+#### KeyPointMultiArray
+
+- Compact Message Definition
+```
+builtin_interfaces/Time stamp
+optical_tracking_msgs/KeyPoint[] data
+```
 
 ## Usage
 
