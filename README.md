@@ -24,8 +24,19 @@ The **marker_detector** detects the markers in the image based on a color. The k
 
 ## Usage
 
-### build
+### Build
 ```
 colcon build --packages-select optical_tracking_msgs --cmake-args -DCMAKE_BUILD_TYPE=Release
 colcon build --packages-select camera_pkg optical_marker_tracking --cmake-args -DCMAKE_BUILD_TYPE=Release
+```
+
+### Run
+```
+ros2 launch optical_marker_tracking optical_marker_tracking.launch.py
+```
+
+or
+
+```
+ros2 launch optical_marker_tracking view_optical_marker_tracking.launch.py
 ```
