@@ -28,7 +28,8 @@ The **marker_detector** detects the markers in the image based on a color. The k
 
 #### KeyPoint
 ```
-geometry_msgs/Point point  # float64 x; float64 y; float64 z
+float64 x
+float64 y
 float32[] descriptor
 ```
 
