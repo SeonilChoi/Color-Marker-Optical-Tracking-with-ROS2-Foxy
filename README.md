@@ -20,7 +20,7 @@ The **camera_publisher** publishes images to the topic **namespace/image/data_ra
   <img src = "https://github.com/user-attachments/assets/c1d17894-cace-4382-adc5-472386a12e4b" width = 750 />
 </p>
 
-The **marker_detector** detects the markers in the image based on a color. The keypoints of the markers are matched using **marker_matcher**, and matched points are triangulated with the **marker_triangulator**. The **marker_tracker** tracks the points in the world coordinate system by seaching for the index of the marker the using predefined geometry of the markers. 
+The **marker_detector** detects the markers in the image based on a color. The keypoints of the markers are matched using **marker_matcher**, and matched points are triangulated with the **marker_triangulator**. The **marker_tracker** tracks the points in the world coordinate system by seaching for the index of the marker the using predefined geometry of the markers. The object is visualized using the **marker_tf2_broadcaster**.
 
 ***
 
