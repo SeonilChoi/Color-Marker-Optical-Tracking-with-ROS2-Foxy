@@ -14,7 +14,7 @@ In this work, we present a method for estimating the position and orientation of
 
 ***
 
-### * optical_marker_tracking
+### optical_marker_tracking
 
 <p align = "left">
   <img src = "https://github.com/user-attachments/assets/c1d17894-cace-4382-adc5-472386a12e4b" width = 750 />
