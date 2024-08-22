@@ -25,6 +25,7 @@ The **marker_detector** detects the markers in the image based on a color. The k
 ## Usage
 
 ### build
-<pre><code>
-  colcon build --packages-select camera_pkg --cmake-args -DCMAKE_BUILD_TYPE=Release
-</code></pre>
+```
+colcon build --packages-select optical_tracking_msgs --cmake-args -DCMAKE_BUILD_TYPE=Release
+colcon build --packages-select camera_pkg optical_marker_tracking --cmake-args -DCMAKE_BUILD_TYPE=Release
+```
