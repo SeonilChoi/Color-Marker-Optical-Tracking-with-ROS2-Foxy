@@ -38,6 +38,12 @@ builtin_interfaces/Time stamp
 optical_tracking_msgs/KeyPoint[] data
 ```
 
+#### PointMultiArray
+```
+builtin_interfaces/Time stamp
+geometry_msgs/Point[] data
+```
+
 ## Usage
 
 ### Build
