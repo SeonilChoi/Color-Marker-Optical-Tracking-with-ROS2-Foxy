@@ -4,7 +4,7 @@ In this work, we present a method for estimating the position and orientation of
 
 ## Packages
 
-### camera_pkg
+### - camera_pkg
 
 <p align = "left">
   <img src = "https://github.com/user-attachments/assets/c1d17894-cace-4382-adc5-472386a12e4b" width = 750 />
@@ -14,7 +14,7 @@ The **camera_publisher** publishes images to the topic **namespace/image/data_ra
 
 ***
 
-### optical_marker_tracking
+### - optical_marker_tracking
 
 <p align = "left">
   <img src = "https://github.com/user-attachments/assets/c1d17894-cace-4382-adc5-472386a12e4b" width = 750 />
@@ -24,7 +24,7 @@ The **marker_detector** detects the markers in the image based on a color. The k
 
 ***
 
-### optical_tracking_msgs
+### - optical_tracking_msgs
 
 #### KeyPoint
 ```
