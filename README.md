@@ -30,7 +30,7 @@ In this work, we present a method for estimating the position and orientation of
 ```
 float64 x
 float64 y
-float32[] descriptor
+uint8[] descriptor
 ```
 
 #### KeyPointMultiArray
