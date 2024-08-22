@@ -12,6 +12,8 @@ In this work, we present a method for estimating the position and orientation of
 
 The **camera_publisher** publishes images to the topic **namespace/image/data_raw**. The geometry of camera is visualized using the **static_camera_tf2_broadcaster**.
 
+***
+
 ### optical_marker_tracking
 
 <p align = "left">
