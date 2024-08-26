@@ -26,19 +26,6 @@ In this work, we present a method for estimating the position and orientation of
 
 ### optical_tracking_msgs
 
-#### KeyPoint
-```
-float64 x
-float64 y
-uint8[] descriptor
-```
-
-#### KeyPointMultiArray
-```
-builtin_interfaces/Time stamp
-optical_tracking_msgs/KeyPoint[] data
-```
-
 #### PointMultiArray
 ```
 builtin_interfaces/Time stamp
