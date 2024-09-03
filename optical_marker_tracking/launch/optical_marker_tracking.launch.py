@@ -14,7 +14,7 @@ def generate_launch_description():
         default=os.path.join(
             get_package_share_directory("optical_marker_tracking"),
             'params',
-            'camera_parameters_config.yaml')
+            'optical_tracking_parameters_config.yaml')
     )
 
     left_marker_detector = Node(
