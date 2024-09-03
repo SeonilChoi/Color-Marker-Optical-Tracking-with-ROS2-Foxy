@@ -27,7 +27,7 @@ StaticCameraTF2Broadcaster::~StaticCameraTF2Broadcaster()
 {
 }
 
-void StaticCameraTF2Broadcaster::send_static_transform(const std::string parent_link, const uint8_t camera_number)
+void StaticCameraTF2Broadcaster::send_static_transform(const std::string & parent_link, const uint8_t & camera_number)
 {
     this->declare_parameter("rotation_matrix_cam" + std::to_string(camera_number), {});
     std::vector<double> R = this->get_parameter("rotation_matrix_cam" + std::to_string(camera_number))

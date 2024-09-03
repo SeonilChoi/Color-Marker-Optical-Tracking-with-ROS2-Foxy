@@ -13,7 +13,7 @@ public:
     virtual ~StaticCameraTF2Broadcaster();
 
 private:
-    void send_static_transform(const std::string parent_link, const uint8_t camera_number);
+    void send_static_transform(const std::string & parent_link, const uint8_t & camera_number);
 
     std::shared_ptr<tf2_ros::StaticTransformBroadcaster> tf_static_broadcaster_;
 };

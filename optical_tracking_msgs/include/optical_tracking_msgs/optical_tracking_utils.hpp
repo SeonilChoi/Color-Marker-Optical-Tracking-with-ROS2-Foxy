@@ -7,7 +7,7 @@ namespace optical_tracking_msgs
 {
 
 template<typename T1, typename T2>
-void convert_vector_to_msg_2d(const std::vector<T1> vec, std::vector<T2> & data)
+void convert_vector_to_msg_2d(const std::vector<T1> & vec, std::vector<T2> & data)
 {
     T2 msg;
     data.reserve(vec.size());
@@ -21,7 +21,7 @@ void convert_vector_to_msg_2d(const std::vector<T1> vec, std::vector<T2> & data)
 }
 
 template<typename T1, typename T2>
-void convert_vector_to_msg_3d(const std::vector<T1> vec, std::vector<T2> & data)
+void convert_vector_to_msg_3d(const std::vector<T1> & vec, std::vector<T2> & data)
 {
     T2 msg;
     data.reserve(vec.size());
@@ -36,7 +36,7 @@ void convert_vector_to_msg_3d(const std::vector<T1> vec, std::vector<T2> & data)
 }
 
 template<typename T1, typename T2>
-void convert_msg_to_vector_2d(const std::vector<T1> data, std::vector<T2> & vec)
+void convert_msg_to_vector_2d(const std::vector<T1> & data, std::vector<T2> & vec)
 {
     T2 pt;
     vec.reserve(data.size());
@@ -50,7 +50,7 @@ void convert_msg_to_vector_2d(const std::vector<T1> data, std::vector<T2> & vec)
 }
 
 template<typename T1, typename T2>
-void convert_msg_to_vector_3d(const std::vector<T1> data, std::vector<T2> & vec)
+void convert_msg_to_vector_3d(const std::vector<T1> & data, std::vector<T2> & vec)
 {
     T2 pt;
     vec.reserve(data.size());

@@ -30,7 +30,7 @@ find_package(rosidl_default_generators REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
-set(msg_files "msg/KeyPoint.msg" "msg/KeyPointMultiArray.msg" "msg/PointMultiArray.msg")
+set(msg_files "msg/PointMultiArray.msg")
 
 rosidl_generate_interfaces(${PROJECT_NAME} ${msg_files} DEPENDENCIES builtin_interfaces geometry_msgs)
 
