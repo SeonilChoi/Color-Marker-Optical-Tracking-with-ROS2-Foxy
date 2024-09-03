@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<robot name="paddle" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <link name="object"/>
+
+  <material name="green">
+    <color rgba="0 0.7 0 1"/>
+  </material>
+
+  <material name="yellow">
+    <color rgba="0.9 0.7 0 1"/>
+  </material>
+
+  <link name="paddle_handle">
+    <visual name="paddle_handle_visual">
+      <origin xyz="0.0 0.0 0.0" rpy="1.570796327 0.0 0.0"/>
+        <geometry>
+          <mesh filename="package://optical_marker_tracking/meshes/paddle_handle.STL" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="yellow"/>
+    </visual>
+    
+    <inertial name="paddle_handle_inertial">
+      <origin xyz="0.07117239 -0.00000193 -0.00000231" rpy="1.570796327 0.0 0.0"/>
+      <mass value="0.02"/>
+      <inertia ixx="0.00002890" ixy="0.0" ixz="0.0" iyy="0.00005966" iyz="0.0" izz="0.00003095"/>
+    </inertial>
+    
+    <collision name="paddle_handle_collision">
+      <origin xyz="0.0 0.0 0.0" rpy="1.570796327 0.0 0.0"/>
+      <geometry>
+          <mesh filename="package://optical_marker_tracking/meshes/paddle_handle.STL" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <link name="paddle_rubber">
+    <visual name="paddle_rubber_visual">
+      <origin xyz="0.0 0.0 0.0" rpy="1.570796327 0.0 0.0"/>
+        <geometry>
+          <mesh filename="package://optical_marker_tracking/meshes/paddle_rubber.STL" scale="0.001 0.001 0.001"/>
+        </geometry>
+        <material name="green"/>
+    </visual>
+    
+    <inertial name="paddle_rubber_inertial">
+      <origin xyz="0.07117239 -0.00000193 -0.00000231" rpy="1.570796327 0.0 0.0"/>
+      <mass value="0.02"/>
+      <inertia ixx="0.00002890" ixy="0.0" ixz="0.0" iyy="0.00005966" iyz="0.0" izz="0.00003095"/>
+    </inertial>
+    
+    <collision name="paddle_rubber_collision">
+      <origin xyz="0.0 0.0 0.0" rpy="1.570796327 0.0 0.0"/>
+      <geometry>
+          <mesh filename="package://optical_marker_tracking/meshes/paddle_rubber.STL" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="base_joint" type="fixed">
+    <parent link="object"/>
+    <child link="paddle_handle"/>
+    <origin xyz="-0.1 0 0" rpy="0 0 0"/>
+  </joint>
+  
+  <joint name="paddle_joint" type="fixed">
+    <parent link="paddle_handle"/>
+    <child link="paddle_rubber"/>
+    <origin xyz="0.1 0.0 0.0" rpy="0 0 0"/>
+  </joint>
+  
+</robot>
+
+

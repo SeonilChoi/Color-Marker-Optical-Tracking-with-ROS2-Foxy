@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<robot name="paddle" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <link name="world"/>
+
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+
+  <material name="white">
+    <color rgba="1.0 1.0 1.0 1"/>
+  </material>
+  
+  <link name="ping_pong_table">
+    <visual name="ping_pong_table_visual">
+      <geometry>
+        <box size="1.5 0.67 0.03"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+    
+    <inertial name="ping_pong_table_inertial">
+      <mass value="1.0"/>
+      <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0"/>
+    </inertial>
+    
+    <collision name="ping_pong_table_collision">
+      <geometry>
+        <box size="1.5 0.67 0.03"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <link name="net">
+    <visual name="net_visual">
+      <geometry>
+        <box size="0.002 0.67 0.105"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+    
+    <inertial name="net_inertial">
+      <mass value="0.02"/>
+      <inertia ixx="0.02" ixy="0.0" ixz="0.0" iyy="0.02" iyz="0.0" izz="0.02"/>
+    </inertial>
+    
+    <collision name="net_collision">
+      <geometry>
+        <box size="0.002 0.67 0.105"/>
+      </geometry>
+    </collision>
+  </link>
+  
+  <joint name="base_joint" type="fixed">
+    <parent link="world"/>
+    <child link="ping_pong_table"/>
+    <origin xyz="0 0 -0.03" rpy="0 0 0"/>
+  </joint>
+  
+  <joint name="net_joint" type="fixed">
+    <parent link="ping_pong_table"/>
+    <child link="net"/>
+    <origin xyz="0.0 0.0 0.0675" rpy="0 0 0"/>
+  </joint>
+</robot>
+
+
