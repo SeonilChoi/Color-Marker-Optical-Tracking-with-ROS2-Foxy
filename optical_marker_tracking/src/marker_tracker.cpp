@@ -150,23 +150,16 @@ void MarkerTracker::permutation(
         const Eigen::Vector3d current_geometry {v1_norm, v2_norm, v3_norm};
         const Eigen::Vector3d current_geometry_angle {angle1, angle2, angle3};
         
-        uint8_t idx_per_one_step;
-        double min_error_per_one_step = 1e+5;
         for (uint8_t i = 0; i < 4; i++){
             double error = (current_geometry - marker_geometry_angle_[i]).norm()
                 + (current_geometry_angle - marker_geometry_angle_[i]).norm();
-            if (error < min_error_per_one_step){
-                idx_per_one_step = i;
-                min_error_per_one_step = error;
+            if (error < min_error){
+                idx = i;
+                min_error = error;
+                min_error_index.assign(data.begin(), data.begin() + r);
             }
         }
         
-        if (min_error_per_one_step < min_error){
-            idx = idx_per_one_step;
-            min_error = min_error_per_one_step;
-            min_error_index.assign(data.begin(), data.begin() + r);
-        }
-   
         return;
     }
 
@@ -199,8 +192,7 @@ void MarkerTracker::reconstruct_pose(
     R(Eigen::placeholders::all, 1) = y / y.norm();
     R(Eigen::placeholders::all, 2) = z / z.norm();
 
-    Eigen::Vector3d t = in_pts[0] + R * to_[idx];
-    t = tw_ + Rw_ * t;
+    const Eigen::Vector3d t = tw_ + Rw_ * (in_pts[0] + R * to_[idx]);
 
     Eigen::Vector4d q;
     convert_rotation_matrix_to_quaternion(Rw_ * R * Ro_[idx], q);
