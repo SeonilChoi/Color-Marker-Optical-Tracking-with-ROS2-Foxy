@@ -42,11 +42,13 @@ colcon build --packages-select camera_pkg optical_marker_tracking --cmake-args -
 
 ### Run
 ```
+ros2 launch camera_pkg camera_publish.launch.py
 ros2 launch optical_marker_tracking optical_marker_tracking.launch.py
 ```
 
 or
 
 ```
+ros2 launch camera_pkg view_camera_publish.launch.py
 ros2 launch optical_marker_tracking view_optical_marker_tracking.launch.py
 ```
