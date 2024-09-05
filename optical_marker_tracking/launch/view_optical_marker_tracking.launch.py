@@ -34,7 +34,7 @@ def generate_launch_description():
         default=os.path.join(
             get_package_share_directory("optical_marker_tracking"),
             'params',
-            'camera_parameters_config.yaml')
+            'optical_tracking_parameters_config.yaml')
     )
 
     left_marker_detector = Node(
@@ -73,6 +73,13 @@ def generate_launch_description():
         package="optical_marker_tracking",
         executable="marker_tf2_broadcaster",
         name="marker_tf2_broadcaster",
+        output="screen"
+    )
+    
+    object_tf2_broadcaster = Node(
+        package="optical_marker_tracking",
+        executable="object_tf2_broadcaster",
+        name="object_tf2_broadcaster",
         output="screen"
     )
     
@@ -116,6 +123,7 @@ def generate_launch_description():
         marker_triangulator,
         marker_tracker,
         marker_tf2_broadcaster,
+        object_tf2_broadcaster,
         #imu_publisher,
         #camera_imu_kalman_filter_publisher,
         robot_state_publisher

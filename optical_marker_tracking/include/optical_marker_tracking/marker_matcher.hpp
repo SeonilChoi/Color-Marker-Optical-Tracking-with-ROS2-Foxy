@@ -83,7 +83,7 @@ private:
 
     const cv::Mat cmtx1_, dist1_, cmtx2_, dist2_, fmtx_;
     const std::vector<std::vector<double>> w1_, b1_, w2_, b2_;
-    const std::vector<double> norm1_, norm2_;
+    const std::vector<double> maximum_value_;
 
     std::vector<std::vector<double>> left_markers_, right_markers_;
     double left_time_, right_time_;

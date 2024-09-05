@@ -4,13 +4,16 @@
 #include <memory>
 #include <cstdint>
 #include <vector>
+#include <string>
 #include "Eigen/Dense"
 
 #include "rclcpp/rclcpp.hpp"
 #include "optical_tracking_msgs/msg/point_multi_array.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "geometry_msgs/msg/pose.hpp"
-    
+
+#include "kalman_filter/kalman_filter.hpp"
+
 class MarkerTracker : public rclcpp::Node
 {
 public:
@@ -21,11 +24,10 @@ public:
     virtual ~MarkerTracker();
 
 private:
-    Eigen::Matrix3d initialize_parameter();
+    Eigen::Matrix3d initialize_parameter(const std::string param_name);
     
     void find_marker_geometry(
         const std::vector<Eigen::Vector3d> & in_pts,
-        uint8_t & idx,
         std::vector<Eigen::Vector3d> & out_pts
     );
     
@@ -35,13 +37,11 @@ private:
         const uint8_t & n,
         const uint8_t & r,
         const std::vector<Eigen::Vector3d> & in_pts,
-        uint8_t & idx,
         double & min_error,
         std::vector<uint8_t> & min_error_index
     );
     
     void reconstruct_pose(
-        const uint8_t & idx,
         const std::vector<Eigen::Vector3d> & in_pts
     );
     
@@ -63,12 +63,13 @@ private:
     const Eigen::Matrix3d Rw_;
     const Eigen::Vector3d tw_;
     
-    const std::vector<Eigen::Matrix3d> Ro_;
-    const std::vector<Eigen::Vector3d> to_;
-    const std::vector<Eigen::Vector3d> marker_geometry_;
-    const std::vector<Eigen::Vector3d> marker_geometry_angle_;
-
-    Eigen::Vector4d pre_q_;
+    const Eigen::Matrix3d Ro_;
+    const Eigen::Vector3d to_;
+    
+    const Eigen::Vector3d marker_geometry_;
+    const Eigen::Vector3d marker_geometry_angle_;
+    
+    std::unique_ptr<KalmanFilter> pos_kf_;
 };
 
 #endif

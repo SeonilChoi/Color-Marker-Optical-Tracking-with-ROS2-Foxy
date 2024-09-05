@@ -1,0 +1,2 @@
+/usr/local/lib/libkalman_filter_library.so
+/usr/local/include/kalman_filter/kalman_filter.hpp

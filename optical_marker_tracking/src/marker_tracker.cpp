@@ -3,64 +3,29 @@
 
 #include <cmath>
 
-const double m_pi = 3.141592654;
-
 MarkerTracker::MarkerTracker() : Node("marker_tracker"),
-    Rw_(initialize_parameter()),
+    Rw_(initialize_parameter("world_rotation_matrix")),
     tw_([this](){
         this->declare_parameter("world_translation_vector", {});
         std::vector<double> vec = this->get_parameter("world_translation_vector").as_double_array();
         return Eigen::Vector3d(vec.data());
     }()),
-    Ro_([this](){
-        this->declare_parameter("object_rotation_matrix", {});
-        std::vector<double> vec = this->get_parameter("object_rotation_matrix").as_double_array();
-        
-        std::vector<Eigen::Matrix3d> m;
-        for (size_t i = 0; i < 4; i++){
-            std::vector<double> data;
-            std::copy(vec.begin() + (i * 9), vec.begin() + (i * 9 + 9), std::back_inserter(data));
-            m.push_back(Eigen::Matrix3d(data.data()).transpose());
-        }
-        return m;
-    }()),
+    Ro_(initialize_parameter("object_rotation_matrix")),
     to_([this](){
         this->declare_parameter("object_translation_vector", {});
         std::vector<double> vec = this->get_parameter("object_translation_vector").as_double_array();
-        
-        std::vector<Eigen::Vector3d> m;
-        for (size_t i = 0; i < 4; i++){
-            std::vector<double> data;
-            std::copy(vec.begin() + (i * 3), vec.begin() + (i * 3 + 3), std::back_inserter(data));
-            m.push_back(Eigen::Vector3d(data.data()));
-        }
-        return m;
+        return Eigen::Vector3d(vec.data());
     }()),
     marker_geometry_([this](){
         this->declare_parameter("marker_geometry", {});
         std::vector<double> vec = this->get_parameter("marker_geometry").as_double_array();
-        
-        std::vector<Eigen::Vector3d> m;
-        for (size_t i = 0; i < 4; i++){
-            std::vector<double> data;
-            std::copy(vec.begin() + (i * 3), vec.begin() + (i * 3 + 3), std::back_inserter(data));
-            m.push_back(Eigen::Vector3d(data.data()));
-        }
-        return m;
+        return Eigen::Vector3d(vec.data());
     }()),
     marker_geometry_angle_([this](){
         this->declare_parameter("marker_geometry_angle", {});
         std::vector<double> vec = this->get_parameter("marker_geometry_angle").as_double_array();
-        
-        std::vector<Eigen::Vector3d> m;
-        for (size_t i = 0; i < 4; i++){
-            std::vector<double> data;
-            std::copy(vec.begin() + (i * 3), vec.begin() + (i * 3 + 3), std::back_inserter(data));
-            m.push_back(Eigen::Vector3d(data.data()));
-        }
-        return m;
+        return Eigen::Vector3d(vec.data());
     }())
-
 {
     const auto QOS_BEKL5V = rclcpp::QoS(rclcpp::KeepLast(5))
         .best_effort().durability_volatile();
@@ -71,16 +36,23 @@ MarkerTracker::MarkerTracker() : Node("marker_tracker"),
     
     pose_publisher_ = this->create_publisher<PoseStamped>(
         "/object/data_raw", QOS_BEKL5V);
+
+    pos_kf_ = std::make_unique<KalmanFilter>(0.01, 6, 3, 1.0, 0.01, 0.01);
+    Eigen::MatrixXd A = Eigen::MatrixXd::Identity(6, 6);
+    A(0, 3) = 0.01;
+    A(1, 4) = 0.01;
+    A(2, 5) = 0.01;
+    pos_kf_->set_transition_matrix(A);
 }
 
 MarkerTracker::~MarkerTracker()
 {
 }
 
-Eigen::Matrix3d MarkerTracker::initialize_parameter()
+Eigen::Matrix3d MarkerTracker::initialize_parameter(const std::string param_name)
 {
-    this->declare_parameter("world_rotation_matrix", {});
-    auto vec = this->get_parameter("world_rotation_matrix").as_double_array();
+    this->declare_parameter(param_name, {});
+    auto vec = this->get_parameter(param_name).as_double_array();
     Eigen::Matrix3d matrix;
     if (vec.size() == 9){
         Eigen::Map<const Eigen::Matrix3d> map(vec.data());
@@ -97,18 +69,16 @@ void MarkerTracker::marker_callback(const PointMultiArray::SharedPtr msg)
     std::vector<Eigen::Vector3d> init_points, points;
     optical_tracking_msgs::convert_msg_to_vector_3d(msg->data, init_points);
     
-    uint8_t idx;
-    find_marker_geometry(init_points, idx, points);
+    find_marker_geometry(init_points, points);
 
     if (points.empty())
         return;
 
-    reconstruct_pose(idx, points);
+    reconstruct_pose(points);
 }
 
 void MarkerTracker::find_marker_geometry(
     const std::vector<Eigen::Vector3d> & in_pts,
-    uint8_t & idx,
     std::vector<Eigen::Vector3d> & out_pts
 ) {   
     const uint8_t in_pts_size = in_pts.size();
@@ -118,11 +88,11 @@ void MarkerTracker::find_marker_geometry(
     double min_error = 1e+5;
     std::vector<uint8_t> min_error_index;
     min_error_index.reserve(3);
-    permutation(init_index, 0, in_pts_size, 3, in_pts, idx, min_error, min_error_index);
+    permutation(init_index, 0, in_pts_size, 3, in_pts, min_error, min_error_index);
 
     out_pts.reserve(3);
-    for (const auto & idx : min_error_index){
-        out_pts.push_back(in_pts[idx]);
+    for (const auto & i : min_error_index){
+        out_pts.push_back(in_pts[i]);
     }
 }  
 
@@ -132,7 +102,6 @@ void MarkerTracker::permutation(
     const uint8_t & n,
     const uint8_t & r,
     const std::vector<Eigen::Vector3d> & in_pts,
-    uint8_t & idx,
     double & min_error,
     std::vector<uint8_t> & min_error_index
 ) {
@@ -150,14 +119,12 @@ void MarkerTracker::permutation(
         const Eigen::Vector3d current_geometry {v1_norm, v2_norm, v3_norm};
         const Eigen::Vector3d current_geometry_angle {angle1, angle2, angle3};
         
-        for (uint8_t i = 0; i < 4; i++){
-            double error = (current_geometry - marker_geometry_angle_[i]).norm()
-                + (current_geometry_angle - marker_geometry_angle_[i]).norm();
-            if (error < min_error){
-                idx = i;
-                min_error = error;
-                min_error_index.assign(data.begin(), data.begin() + r);
-            }
+        double error = (current_geometry - marker_geometry_).norm()
+            + (current_geometry_angle - marker_geometry_angle_).norm();
+        
+        if (error < min_error){
+            min_error = error;
+            min_error_index.assign(data.begin(), data.begin() + r);
         }
         
         return;
@@ -165,13 +132,12 @@ void MarkerTracker::permutation(
 
     for (uint8_t i = depth; i < n; i++){
         std::swap(data[depth], data[i]);
-        permutation(data, depth+1, n, r, in_pts, idx, min_error, min_error_index);
+        permutation(data, depth+1, n, r, in_pts, min_error, min_error_index);
         std::swap(data[i], data[depth]);
     }
 }
 
 void MarkerTracker::reconstruct_pose(
-    const uint8_t & idx,
     const std::vector<Eigen::Vector3d> & in_pts
 ) {
     const Eigen::Vector3d v1 = in_pts[1] - in_pts[0];
@@ -179,25 +145,27 @@ void MarkerTracker::reconstruct_pose(
 
     const Eigen::Vector3d z = v1.cross(v2);
     Eigen::Vector3d x, y;
-    if (idx == 2){
-        y = v2;
-        x = y.cross(z);
-    } else {
-        x = v1;
-        y = z.cross(x);
-    }
+    x = v1;
+    y = z.cross(x);
 
     Eigen::Matrix3d R;
     R(Eigen::placeholders::all, 0) = x / x.norm();
     R(Eigen::placeholders::all, 1) = y / y.norm();
     R(Eigen::placeholders::all, 2) = z / z.norm();
 
-    const Eigen::Vector3d t = tw_ + Rw_ * (in_pts[0] + R * to_[idx]);
+    const Eigen::Vector3d t = tw_ + Rw_ * (in_pts[0] + R * to_);
 
     Eigen::Vector4d q;
-    convert_rotation_matrix_to_quaternion(Rw_ * R * Ro_[idx], q);
+    convert_rotation_matrix_to_quaternion(Rw_ * R * Ro_, q);
+    q = q.normalized();
 
-    publish_point_msg(t, q);
+    Eigen::VectorXd pos;
+    pos_kf_->set_kalman_gain();
+    pos_kf_->set_covariance_matrix(t);
+    pos_kf_->get_state_vector(pos);
+    const Eigen::Vector3d kf_t = {pos(0), pos(1), pos(2)};
+    
+    publish_point_msg(kf_t, q);
 }
 
 void MarkerTracker::convert_rotation_matrix_to_quaternion(

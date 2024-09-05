@@ -51,6 +51,9 @@ install(DIRECTORY launch params urdf meshes DESTINATION share/${PROJECT_NAME})
 
 include_directories(include)
 
+link_directories(${kalman_filter_library})
+include_directories(${kalman_filter_library_INCLUDE_DIRS})
+
 set(marker_detector_dependencies "rclcpp" "sensor_msgs" "optical_tracking_msgs" "OpenCV" "image_transport" "cv_bridge")
 add_executable(marker_detector src/marker_detector.cpp)
 ament_target_dependencies(marker_detector ${marker_detector_dependencies})
@@ -66,15 +69,28 @@ add_executable(marker_triangulator src/marker_triangulator.cpp)
 ament_target_dependencies(marker_triangulator ${marker_triangulator_dependencies})
 install(TARGETS marker_triangulator DESTINATION lib/${PROJECT_NAME})
 
+find_library(kalman_filter_library NAMES kalman_filter_library PATHS /usr/local/lib)
+find_path(kalman_filter_library_INCLUDE_DIRS NAMES kalman_filter/kalman_filter.hpp PATHS usr/local/include)
+
 set(marker_tracker_dependencies "rclcpp" "optical_tracking_msgs" "tf2")
 add_executable(marker_tracker src/marker_tracker.cpp)
 ament_target_dependencies(marker_tracker ${marker_tracker_dependencies})
+target_link_libraries(marker_tracker ${kalman_filter_library})
 install(TARGETS marker_tracker DESTINATION lib/${PROJECT_NAME})
+
+set_target_properties(marker_tracker PROPERTIES
+    INSTALL_RPATH_USE_LINK_PATH TRUE
+    INSTALL_RPATH "${kalman_filter_library}")
 
 set(marker_tf2_broadcaster_dependencies "rclcpp" "optical_tracking_msgs" "geometry_msgs" "tf2" "tf2_ros")
 add_executable(marker_tf2_broadcaster src/marker_tf2_broadcaster.cpp)
 ament_target_dependencies(marker_tf2_broadcaster ${marker_tf2_broadcaster_dependencies})
 install(TARGETS marker_tf2_broadcaster DESTINATION lib/${PROJECT_NAME})
+
+set(object_tf2_broadcaster_dependencies "rclcpp" "geometry_msgs" "tf2" "tf2_ros")
+add_executable(object_tf2_broadcaster src/object_tf2_broadcaster.cpp)
+ament_target_dependencies(object_tf2_broadcaster ${object_tf2_broadcaster_dependencies})
+install(TARGETS object_tf2_broadcaster DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
 

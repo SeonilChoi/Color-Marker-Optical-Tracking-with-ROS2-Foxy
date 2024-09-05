@@ -37,21 +37,13 @@ void MarkerDetector::image_callback(const Image::SharedPtr msg)
     const cv::Mat & frame = cv_ptr->image;
 
     std::vector<cv::Vec3f> pts;
-    pts.reserve(4);
+    pts.reserve(3);
     segment_markers(frame, pts);
     
     if (pts.empty())
         return;
 
     publish_point_msg(pts);
-}
-
-void MarkerDetector::publish_point_msg(const std::vector<cv::Vec3f> & pts)
-{
-    PointMultiArray msg;
-    msg.stamp = this->get_clock()->now();
-    optical_tracking_msgs::convert_vector_to_msg_3d(pts, msg.data);
-    marker_publisher_->publish(msg);
 }
 
 void MarkerDetector::segment_markers(const cv::Mat & frame, std::vector<cv::Vec3f> & pts)
@@ -110,6 +102,14 @@ void MarkerDetector::segment_markers(const cv::Mat & frame, std::vector<cv::Vec3
         if (largest_area > 20)
             pts.push_back(c);
     }
+}
+
+void MarkerDetector::publish_point_msg(const std::vector<cv::Vec3f> & pts)
+{
+    PointMultiArray msg;
+    msg.stamp = this->get_clock()->now();
+    optical_tracking_msgs::convert_vector_to_msg_3d(pts, msg.data);
+    marker_publisher_->publish(msg);
 }
 
 int main(int argc, char * argv[])

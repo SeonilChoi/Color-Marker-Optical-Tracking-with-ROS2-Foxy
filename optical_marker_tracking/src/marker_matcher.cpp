@@ -202,15 +202,10 @@ MarkerMatcher::MarkerMatcher() : Node("marker_matcher"),
         std::vector<double> data = this->get_parameter("fc2_bias").as_double_array();
         return vec_to_mat(data, 1, 3); 
     }()),
-    norm1_([this](){
-        this->declare_parameter("normalize_value_0", {});
-        return this->get_parameter("normalize_value_0").as_double_array();        
-    }()),
-    norm2_([this](){
-        this->declare_parameter("normalize_value_2", {});
-        return this->get_parameter("normalize_value_2").as_double_array();        
-    }()),
-    left_time_(), right_time_()
+    maximum_value_([this](){
+        this->declare_parameter("maximum_value", {});
+        return this->get_parameter("maximum_value").as_double_array();        
+    }())
 {
     const auto QOS_BEKL5V = rclcpp::QoS(rclcpp::KeepLast(5))
         .best_effort().durability_volatile();
@@ -228,8 +223,11 @@ MarkerMatcher::MarkerMatcher() : Node("marker_matcher"),
 
     timer_ = this->create_wall_timer(1ms, [this](){ timer_callback(); });
 
-    left_markers_.reserve(4);
-    right_markers_.reserve(4);
+    left_time_ = 0.0;
+    right_time_ = 0.0;
+
+    left_markers_.reserve(3);
+    right_markers_.reserve(3);
 }
 
 MarkerMatcher::~MarkerMatcher()
@@ -257,7 +255,7 @@ void MarkerMatcher::timer_callback()
     if ((left_markers_.empty()) || (right_markers_.empty()))
         return;
 
-    if ((left_markers_.size() < 3) || (right_markers_.size() < 3)){
+    if ((left_markers_.size() != 3) || (right_markers_.size() != 3)){
         left_markers_.clear();
         right_markers_.clear();
         return;
@@ -332,6 +330,11 @@ void MarkerMatcher::find_matching_points(
     if (min_error_index.empty())
         return;
     
+    for (uint8_t i = 0; i < min_error_index.size(); i++){
+        if (error_table[i][min_error_index[i]] > 0.27)
+            return;    
+    }
+
     output1.reserve(min_error_index.size());
     output2.reserve(min_error_index.size());
     for (uint8_t i = 0; i < min_error_index.size(); i++){
@@ -361,8 +364,8 @@ void MarkerMatcher::set_error_table(
         }
     }
 
-    divide(distances, max_distance * 2.);
-    divide(losses, max_loss * 2.);
+    divide(distances, max_distance * 10. / 7.);
+    divide(losses, max_loss * 10. / 3.);
 
     add(distances, losses, output);
 }
@@ -405,8 +408,8 @@ void MarkerMatcher::inference_model(
     double & output  
 ) {
     std::vector<std::vector<double>> norm_pt1, norm_pt2;
-    norm_pt1.push_back(divide(pt1, norm1_));
-    norm_pt2.push_back(divide(pt2, norm2_));
+    norm_pt1.push_back(divide(pt1, maximum_value_));
+    norm_pt2.push_back(divide(pt2, maximum_value_));
 
     std::vector<std::vector<double>> x = dot(norm_pt1, w1_);
     add(b1_, x);
