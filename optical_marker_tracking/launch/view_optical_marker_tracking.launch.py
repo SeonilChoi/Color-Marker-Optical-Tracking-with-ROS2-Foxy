@@ -90,27 +90,7 @@ def generate_launch_description():
         parameters=[param_dir],
         output="screen"
     )
-    """
-    imu_publisher = Node(
-        package = "imu_serial_communication",
-        executable = "imu_publisher",
-        name = "imu_publisher",
-        parameters = [{
-            "MPU6050":True,
-            "AK8963":False
-        }]
-    )
     
-    camera_imu_kalman_filter_publisher = Node(
-        package = "camera_imu_kalman_filter",
-        executable = "camera_imu_kalman_filter_publisher",
-        name = "camera_imu_kalman_filter_publisher",
-        parameters = [{
-            "rolling_mean":True,
-            "rolling_window_size":5
-        }]
-    )
-    """
     return LaunchDescription([
         DeclareLaunchArgument(
             "param_dir",
@@ -124,8 +104,6 @@ def generate_launch_description():
         marker_tracker,
         marker_tf2_broadcaster,
         object_tf2_broadcaster,
-        #imu_publisher,
-        #camera_imu_kalman_filter_publisher,
         robot_state_publisher
     ])
     
