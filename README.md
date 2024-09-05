@@ -1,5 +1,9 @@
 # Color Marker Optical Tracking with ROS2 Foxy
 
+<p align = "left">
+  <img src = "https://github.com/user-attachments/assets/7e47dee8-fbfb-4c9b-be00-4a9c8930e251" width = 750 />
+</p>
+
 In this work, we present a method for estimating the position and orientation of an object using an optical tracking technique with color marker spheres, implemented in ROS2 Foxy. We employ a stereo-vision system to perform triangulation.
 
 ## Packages
